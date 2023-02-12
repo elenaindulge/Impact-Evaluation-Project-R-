@@ -1,0 +1,392 @@
+---
+title: "Impact Evaluation: the POCSO Act Publication in India 2012"
+author: "Huixi Yang"
+date: "12/8/2022"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE, error=FALSE)
+#install.packages("readxl")
+#install.packages("maptools")
+#install.packages("rgeos")
+#install.packages("ggmap")
+#install.packages("scales")
+#install.packages("RColorBrewer")
+#install.packages("shadowtext")
+#install.packages("gridExtra")
+#install.packages("tidyverse")
+#install.packages("kableExtra")
+#library(kableExtra)
+#library(devtools)
+#library(sjPlot)
+#library(jtools)
+library(tidyr)
+library(tidyverse)
+library(readxl)
+library(haven)
+library(caret)
+library(ggplot2)
+library(maptools)
+library(rgeos)
+library(ggmap)
+library(scales)
+library(RColorBrewer)
+library(shadowtext)
+library(gridExtra)
+set.seed(8000)
+shp <- readShapeSpatial('India_Shape/india_st.shp')
+pocsodata <- read_excel('pocso_data.xlsx')
+pocsodata$Poverty2001 <- as.numeric(pocsodata$Poverty2001)
+pocsodata$UnemM1999_00 <- as.numeric(pocsodata$UnemM1999_00)
+pocsodata$UnemM2011_12 <- as.numeric(pocsodata$UnemM2011_12)
+pocsodata$UnemM2018_19 <- as.numeric(pocsodata$UnemM2018_19)
+pocsodata$UnemF1999_00 <- as.numeric(pocsodata$UnemF1999_00)
+pocsodata$UnemF2011_12 <- as.numeric(pocsodata$UnemF2011_12)
+pocsodata$UnemF2018_19 <- as.numeric(pocsodata$UnemF2018_19)
+pocsodata$UnemA1999_00 <- as.numeric(pocsodata$UnemA1999_00)
+pocsodata$UnemA2011_12 <- as.numeric(pocsodata$UnemA2011_12)
+pocsodata$UnemA2018_19 <- as.numeric(pocsodata$UnemA2018_19)
+```
+
+## Introduction
+
+The purpose of this project is to examine the POCSO Act's role in changing policies and gender-based violence, with a specific focus on children in India. The project includes an overview of different types of sexual violence and its impact on children, including both physical and mental harm, and added risks for violence against children from diverse perpetrators, including through harmful practices. One of the major obstacles to stopping gender-based violence against children is the implementation of policies.
+
+India has one of the largest populations of children in the world. The Parliament of India passed the "Protection of Children Against Sexual Offenses Bill (POCSO) in 2012, which aims to protect children from offenses of sexual assault, sexual harassment, and pornography (POCSO Act India). However, topics related to child sexual abuse are often sensitive and thus stay undiscussed due to social and historical discourse. After the Child Sexual Abuse Laws have been enacted, more documents and data are available to analyze the prevention of children from sexual violence while providing safeguards for children during the juridical process. The implementation stays challenging in the Indian context. The efficacy of law measurement is also difficult due to the short time after the law's enactment. 
+
+This project aims to collect data from India's Central Bank and National Crime Records Bureau to analyze the impact of the POCSO Act. Additionally, identifying important variables that correlate with crime records to support implementation tools is also included.
+
+## Literature Review
+
+As the most vulnerable population for physical and mental standings, the effects of gender violence might cause lifelong trauma and risks for youth (Moffitt & Klaus-Grawe 2012 Think Tank, 2013). More importantly, many victims might turn into perpetrators with severe trauma from sexual violence. Social norms always blame victims for their experiences; thus, people hesitate to seek help and report their experiences to local hospitals and police stations (Grubb & Turner, 2012). The following section demonstrates harmful practices worldwide, focusing on India, that violate children's rights. 
+
+Child Marriage: Child marriage violates human rights but is very common. In India, the prevalence of child marriage among women before 18 years is 23.3 percent (UNICEF, 2022). In many developing countries, marriages can be perceived as protection from family due to poverty (UNICEF data). Child marriage can lead to a lifetime of suffering where girls often experience social isolation and are more likely to be exposed to domestic violence. Early marriage causes early pregnancy and early death of the child.
+
+Female Genital Mutilation (FGM): The practice involves the partial or total removal of external female genitalia for social or cultural reasons (WHO). The practice leaves lifelong physical injury to children's health and causes severe health problems, which increases newborn death rates. Today, more than 200 million girls have undergone FGM, with most victims under 15(WHO, 2022). In India, FGM is practiced by some Islamic groups, with no law banning the practice. Religious leaders kept FGM a secret and explained the practice of controlling sexual urges (Thelwell, 2021). There is no current clue on the justification of FGM in India due to religious sensitivities. 
+
+Rape: Young people around 12-34 years are at the highest risk for rape and sexual assault. Approximately one in 10 children will be sexually abused before their 18th birthday, and more than 120 million girls worldwide have experienced forced sexual acts at some point in their lives (UNICEF, 2014). Some results show that women in college are three times more likely than women in general to experience sexual violence. In conflicting areas, 15 million girls aged 15-19 experienced forced sex in their lifetime, and victims have a high risk of HIV infections. Youth sexual violence can have long-lasting effects on mental and physical health. According to research in the United States, youth victims are about four times more likely to develop symptoms of drug abuse and about four times more likely to experience PTSD than adults. More importantly, young people are less likely to seek help and self-report their experiences because of victim blaming (Khoury et al., 2010). Rape is one of the most common crimes against women in India. According to recent data from NCRB, more than 20,000 child rapes were recorded in 2018. Overall, the crime against children from 2008 to 2018 has significantly increased by six times, from 22,500 cases recorded in 2008 to 141764 cases in 2018 (NCRB, 2020). Since the POCSO act, more cases have demonstrated the need for government intervention to protect Indian children from violence. 
+
+Sexual Assault in Digital Era, Pornography: Cyberbullying, online sexual assault, and pornography are new phenomena that target women and girls. Unfortunately, there is no clear definition of what online sexual exploitation is, so perpetrators can often walk away with crimes and easily repeat their crimes (Hillman et al., 2014). According to the Cyberbullying Research Center, 36.7% of adolescent girls have experienced cyberbullying in their lifetimes. A study done by the World Health Organization shows that physical and sexual violence frequently results in psychological harm for survivors, and psychological and sexual abuse can result in physical injuries such as self-harm and suicide. Child pornography is a serious issue in India today that needs government intervention. The nature of child pornography begins with child abuse, resulting in severe physical and mental issues for victims. Today, these pornography industries have made millions of dollars in profits from trading, selling, and sharing child pornographies. After POCSO Act was enacted in 2012, the Indian government sought safeguards for children from child pornography. In August 2019, the Parliament also passed an amendment to the Protection of Children from Sexual Offences Act 2012 to improve the punishment of children using children for sexual and commercial purposes with up to five years imprisonment and a fine. However, the implementation is challenging, with few judgments at the level of the High Court and the Supreme Court. For example, in the State of A.P. v. ManagaliYadagiri, a few persons raped a 14-year girl, and pictures were taken. Perpetrators have threatened her to keep the rape a secret, or they would make these photos public (Bhadury, 2022).
+
+## Data
+
+The data used in this project comes from two web sources: the Reserve Bank of India, India's Central Bank, and the National Crime Records Bureau. Both websites provide state-level statistics by year and thus can be merged and analyzed. In order to examine the effects of the POCSO Act published in 2012, this report gathered information from 2000 to 2020(statistics after 2021 are not available yet). From the Reserve Bank Of India website, state-level information for Literacy Rate, Population, Female Count per Thousand males, and Poverty Rate are available. It is worth noticing that government only gathers these statistics once per decade, and thus they are only available for some individual years. Since 2021's statistics are not published, this report only takes 2001 and 2011 statistics into the analysis. These statistics are used as the independent control variables in the model. From the website of the National Crime Records Bureau, each state's annual count of Crimes against Children from 2001 to 2020 is recorded and used as the dependent variable in the model. 
+
+The data from sources are presented with multiple tables, each table only including information for one particular variable with states as the primary key. For example, the Crime against Children is recorded in 20 different tables containing the count for a particular year in 2001-2020. When merging the data, the first step was to rename the variables to include both the variable title and the year of collection. For example, Population information collected in 2001 and 2011 was renamed Population2001 and Population2011 in the final merged table, and Crime against Children was renamed y2001 to y2020 for convenience. The next step was to align the data based on the state's name. The state's name provided by the two websites has differences in cases and sequence, which needed to be manually unified. State Telangana and Ladakh are removed since they have multiple columns missing. State Dadra and Nagar Haveli were merged with State Damen & Diu for all the independent variables since the Crime against Children in these two states was reported as one sum. In order to further include the year-fixed effect, the data was also converted from a wide format to a long format, with the year as a newly generated variable that can be further controlled in the regression model. 
+  
+## Control Variables
+
+Among the 17 social and demographic indicators provided by the Reserve Bank of India's website, Literacy Rate, Population, Female Count per Thousand Male, and Poverty Rate are selected in this report as control variables that help isolates the effects of the POCSO act publication on the count of Crime against Children. The reason is that these variables correlate with the count of Crimes against Children before the POCSO act was introduced(before 2012). Map visualizations are included below to provide a clearer view of the relationships.
+
+### Population & Crime Against Children (2011)
+
+The population and Crime against Children map visualization in 2011 indicates a positive correlation between these two variables. The states at the center, which include Uttar Pradesh, Madya Pradesh, and Maharashtra, are more populated regions and, at the same time, have high occurrences of crime against children. However, states at the top and right periphery are less populated and have fewer crime records. These results conform with the intuition that crime against children is more likely to happen in states with dense populations since there are more possible victims and perpetrators.
+
+```{r fig.height= 3}
+shp.f <- fortify(shp, region = "STATE")
+
+merge.shp.coef<-merge(shp.f,pocsodata, by="id", all.x=TRUE)
+final.plot<-merge.shp.coef[order(merge.shp.coef$order), ]
+cnames <- aggregate(cbind(long, lat) ~ id, data=final.plot, FUN=function(x) mean(range(x)))
+cnames <- cnames[cnames$id %in% c('UTTAR PRADESH', 'MADHYA PRADESH', 'DADRA AND NAGAR HAVELI
+', 'MAHARASHTRA', 'WEST BENGAL', 'LAKSHADWEEP'),]
+
+plotPop2011 <- ggplot() +
+  geom_polygon(data = final.plot,
+               aes(x = long, y = lat, group = group, fill = Population2011), 
+               color = "black", size = 0.25) + 
+  coord_map()+
+  scale_fill_gradient(name="Pop", low = 'white', high = 'red')+
+  labs(title="Population 2011")+
+  xlab('Longitude')+
+  ylab('Latitude')+
+  geom_shadowtext(data=cnames, aes(long, lat, label = id), size=2, color="white")
+
+plotCAC2011 <- ggplot() +
+  geom_polygon(data = final.plot,
+               aes(x = long, y = lat, group = group, fill = y2011), 
+               color = "black", size = 0.25) + 
+  coord_map()+
+  scale_fill_gradient(name="CaC", low = 'white', high = 'red')+
+  labs(title="Crime Against Children 2011")+
+  xlab('Longitude')+
+  ylab('Latitude')+
+  geom_shadowtext(data=cnames, aes(long, lat, label = id), size=2, color="white")
+
+grid.arrange(plotPop2011, plotCAC2011, nrow = 1, padding = 0 )
+```
+
+
+### Literacy Rate & Crime Against Children (2011)
+
+The visualization shows that literacy Rate and Crime against Children have a negative correlation. The crime cases are relatively low in two of the most literate states, with the red color on the left. While with the states that have the highest count of crime cases, the literacy rate is just around or below average. It conforms with the intuition that education level does have some degree of influence on reducing the amount of crime against children.
+
+```{r fig.height = 3}
+plotLit2011 <- ggplot() +
+  geom_polygon(data = final.plot,
+               aes(x = long, y = lat, group = group, fill = LitRate2011), 
+               color = "black", size = 0.25) + 
+  coord_map()+
+  scale_fill_gradient(name="Lit", low = 'white', high = 'red')+
+  labs(title="Literacy Rate 2011")+
+  xlab('Longitude')+
+  ylab('Latitude')+
+  geom_shadowtext(data=cnames, aes(long, lat, label = id), size=2, color="white")
+
+grid.arrange(plotLit2011, plotCAC2011, nrow = 1)
+```
+
+### Sex Ratio & Crime Against Children (2011)
+
+The female/male ratio also seems negatively related to the Crime against Children. In the regions where female density is higher, which are also regions on the southeast side of the countries, the count of crime against children is much less than that in the regions where male density is higher, which are more in the middle of the country. It conforms with the fact that there are many more male perpetrators than females in crime against children. 
+
+```{r fig.height = 3}
+plotFpM2011 <- ggplot() +
+  geom_polygon(data = final.plot,
+               aes(x = long, y = lat, group = group, fill = FpM2011), 
+               color = "black", size = 0.25) + 
+  coord_map()+
+  scale_fill_gradient(name="FpM", limits=c(870,1100), low = 'white', high = 'red')+
+  labs(title="Female per 1000 Male 2011")+
+  xlab('Longitude')+
+  ylab('Latitude')+
+  geom_shadowtext(data=cnames, aes(long, lat, label = id), size=2, color="white")
+
+plotCAC2019 <- ggplot() +
+  geom_polygon(data = final.plot,
+               aes(x = long, y = lat, group = group, fill = y2019), 
+               color = "black", size = 0.25) + 
+  coord_map()+
+  scale_fill_gradient(name="CaC", low = 'white', high = 'red')+
+  labs(title="Crime Against Children 2011")+
+  xlab('Longitude')+
+  ylab('Latitude')+
+  geom_shadowtext(data=cnames, aes(long, lat, label = id), size=2, color="white")
+
+grid.arrange(plotFpM2011, plotCAC2011, nrow = 1)
+```
+
+### Poverty Rate & Crime Against Children (2011)
+
+The Poverty Rate also seems to have a negative correlation with Crime against Children. States like Uttar Pradesh and Maharashtra are high crime rates but low poverty rates. On the other hand, states with the highest poverty rates, such as West Bengal, have relatively low crime counts against children. However, exceptions exist, like Madhya Pradesh's high poverty rate and crime counts. Nevertheless, the pattern shows that the poorer regions have a lower count of crime against children. 
+
+```{r fig.height = 3}
+plotPov2011 <- ggplot() +
+  geom_polygon(data = final.plot,
+               aes(x = long, y = lat, group = group, fill = Poverty2011), 
+               color = "black", size = 0.25) + 
+  coord_map()+
+  scale_fill_gradient(name="Pov", low = 'white', high = 'red')+
+  labs(title="Poverty Rate 2011")+
+  xlab('Longitude')+
+  ylab('Latitude')+
+  geom_shadowtext(data=cnames, aes(long, lat, label = id), size=2, color="white")
+
+grid.arrange(plotPov2011, plotCAC2011, nrow = 1)
+```
+
+## Model - MLR with two-way fixed effect model & Random forest decision tree prediction model
+
+Multiple linear regression models with two-way fixed effects are the most effective and direct way to evaluate the impact of the POCSO act's publication in 2012 on the count of Crime against Children. An indicator variable POCSO is created based on whether the POCSO act has been published (if the year of the data is later than 2012, the POCSO is marked as 1, else marked as 0). To prevent demographic differences between each state confounds the model's results, our model includes four demographic indicators introduced above as control variables. Just as some states have more crimes than others, crime might vary by year. Besides controlling for the demographic indicators, controlling for the fixed effects for states and years is also important since it can isolate the effects of the POCSO act publication on the variable POCSO and thus reduce the endogeneity of the model.
+
+The following is the full list of the variables used in the model
+
+- y: Crime Against Children count in each year and each state
+- X: POCSO=1 in years 2013-2020, POCSO=0 in years 2001-2012
+- C1: Literacy Rate 2011
+- C2: Population 2011
+- C3: Female per 1000 males 2011
+- C4: Poverty Rate 2011
+- Time fixed effect: A dummy variable created for each year
+- State fixed effect: A dummy variable created for each state
+
+Besides MLR, a random forest prediction model is implemented to examine and find the significant factors correlated with Crime against Children and predict future crime counts. The model shows a ranking on the importance of the variables and also allows making predictions if given data on the dependent variables. The sample is separated by year, with all data before 2017 used as a training sample and the rest as the test sample. A random forest model is trained with .mtry as 1 to 5 and with 5-fold train control and then used to make predictions on the test sample. By examining the accuracy and the predicted values, it can be decided whether this model can further help the government predict the future number of crimes against children in each state.
+
+
+## Results
+
+The table below demonstrates the results of my MLR model. It shows that POCSO Act positively correlates with Crime Against Children at a 0.001 significant level. Holding all other variables constant, on average, Crime against Children would be 6283.86 more after the POCSO Act has been enacted than before the enactment. The model has an R square of 0.59, which means the regression model explains 59% of the variability observed in the target variables. This result indicates that with POCSO Act enacted, more cases have been reported after 2012. 
+
+The model reveals the problem that the reported Crimes against Children before 2012 may be very different from the real number of Crimes against Children cases. Many victims may not have the right ways to defend themselves against the law or be unaware they could protect themselves. With the law enacted, people are more willing and capable of revealing the crime and seeking help from the justice system. Though the number of cases increasing after the POCSO act enactment seems bad news, it could benefit society's future growth against Crime against Children. 
+
+<center>
+
+![MLR Result]("MLRResult.png"){width=50%}
+
+</center>
+
+```{r}
+pocsodata_long <- gather(pocsodata, year, y, y2001:y2020, factor_key = TRUE)
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2001"] <- "2001"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2002"] <- "2002"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2003"] <- "2003"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2004"] <- "2004"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2005"] <- "2005"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2006"] <- "2006"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2007"] <- "2007"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2008"] <- "2008"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2009"] <- "2009"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2010"] <- "2010"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2011"] <- "2011"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2012"] <- "2012"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2013"] <- "2013"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2014"] <- "2014"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2015"] <- "2015"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2016"] <- "2016"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2017"] <- "2017"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2018"] <- "2018"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2019"] <- "2019"
+levels(pocsodata_long$year)[levels(pocsodata_long$year)=="y2020"] <- "2020"
+
+pocsodata_long$year <- as.numeric(as.character(pocsodata_long$year))
+
+pocsodata_long$POCSO <- ifelse(pocsodata_long$year>=2013, 1, 0)
+pocsodata_long$year <- (as.character(pocsodata_long$year))
+mlmodel <- lm(y ~ POCSO + LitRate2011 + Population2011 + FpM2011 + Poverty2011 + id + year, data = pocsodata_long, na.action = na.omit)
+```
+
+Besides MLR with a two-way fixed effect model, the random forest algorithm prediction model provides more information regarding the variables' importance ranking and a more robust R-squared. RMSE was used to select the optimal model using the smallest value. According to the model result, the final value used for the model was mtry = 5, with an R-squared of 0.8898228. The R-squared is much more robust than the linear regression model and thus means that the random forest model does much better in explaining the variability observed in the target variables. The graph of the variables' importance shows that the state-fixed effect and the POCSO act enactment have the most influence on the count of Crimes Against Children. Among the control variables, surprisingly, sex ratio and poverty rate are much more important than the population and literacy rate. 
+
+```{r}
+pocsodata_long$year <- as.numeric(pocsodata_long$year)
+
+pocso_train <- na.omit(pocsodata_long[pocsodata_long$year < 2017, ])
+pocso_test <- na.omit(pocsodata_long[pocsodata_long$year>=2017, ])
+
+rf_mod <- train(
+  y ~ POCSO + LitRate2011 + Population2011 + FpM2011 + Poverty2011 + StateCode,
+  data = pocso_train, 
+  trControl = trainControl(method = 'cv', number = 5), 
+  method = 'rf',
+  tuneGrid = expand.grid(.mtry = c(1,2,3,4,5)),
+  importance = TRUE
+)
+#rf_mod
+
+vi <- varImp(rf_mod)
+#vi$importance
+ggplot(vi)
+
+```
+
+The prediction made by the model on the test sample and the actual value of Crime against Children is put together on the following graph. The two lines have very similar patterns, meaning that the prediction is overall accurate in trend. However, regarding the prediction when there was a significant amount of Crime Against Children, the prediction failed to capture the exact amount. 
+
+```{r}
+pocso_test<-dplyr::mutate(pocso_test, key = row_number())
+pocso_test$predict_rf <- as.numeric(paste(predict(rf_mod, pocso_test)))
+ggplot(pocso_test, aes(key)) + 
+  ylab("Crime against Children") +
+  geom_line(aes(y = pocso_test$predict_rf, colour = "prediction")) + 
+  geom_line(aes(y = pocso_test$y, colour = "real"))
+```
+
+
+## Limitations
+There are several limitations regarding the data of this report:
+
+1. The data utilized in this paper is state-level data instead of person-level data. Therefore, it can only reflect a general effect of the POCSO act publication across the country and make predictions at the state level. 
+
+2. The available data for control variables are limited to 2001 and 2011. It is only possible to examine the correlation between these variables and the Crime against Children across states in these two years. Using a prediction model to generate predicted data for these variables for the years missing is possible. However, because the available data is too little, the prediction will likely be very biased. Therefore, this report only utilizes the data in 2011 for control variables instead of generating predicted values for missing data. 
+
+3. The most recent data on the demographic indicators in 2021 have yet to be available on official websites. Therefore, the model of this article is implemented only based on demographic data from about ten years ago. Our prediction model could be more accurate in predicting future cases if the data from 2021 is utilized. 
+
+## Conclusion
+
+Overall, data from the Reserve Bank of India and the National Crime Records Bureau has demonstrated the importance of establishing the POCSO Act in India. The regression model has shown that POCSO Act correlates significantly with Crime Against Children in India. Additionally, the random forest algorithm prediction proves that the POCSO Act enactment has the most influence on the count of Crime Against Children beside the State-fixed effect. Therefore, the implementation of the POCSO Act is a great success. 
+
+## Work Cited
+
+Atzatzev. (2021, July 22). Understanding the relationship between child marriage and female genital mutilation. UNICEF DATA. Retrieved October 20, 2022, from https://data.unicef.org/resources/understanding-the-relationship-between-child-marriage-and-fgm/
+
+Bartholet, Elizabeth. “Ratification by the United States of the Convention on the Rights of the Child: Pros and Cons from a Child’s Rights Perspective by Elizabeth Bartholet :: SSRN.” Search ELibrary :: SSRN, https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1833621. Accessed 10 Oct. 2022.
+
+Bhadury, S. (2022). View of Child Pornography in India: Issues and Challenges. Journal of Positive School Psychology; Journal of Positive School Psychology. https://www.journalppw.com/index.php/jpsp/article/view/8639/5646
+
+Grubb, A., &amp; Turner, E. (2012, July 7). Attribution of blame in rape cases: A review of the impact of rape myth acceptance, gender role conformity and substance use on victim blaming. Aggression and Violent Behavior. Retrieved October 20, 2022, from https://www.sciencedirect.com/science/article/pii/S135917891200064X?casa_token=JIhKPdPOKFAAAAAA%3ABHbQxNd_ormViEARccZUsth-eUdvuPFIpsuLHHwNGKs4Cg7a2pCUdwq0mY9s8Qr3hsg3MGqJXWU
+
+Hillman, H., Hooper, C., &amp; Choo, K.-K. R. (2014, November 19). Online child exploitation: Challenges and future research directions. Computer Law &amp; Security Review. Retrieved October 20, 2022, from https://www.sciencedirect.com/science/article/pii/S0267364914001575?casa_token=rXW5Cc4ygVgAAAAA%3AJh0-nybxw4bnGwfKc6GN0Ivf4GhiWMLSGgkuKbXbMpjGq-6piHYGD4iALs-t4dZd4DML2yr309w
+
+Jassal, N. (2020). Gender, Law Enforcement, and Access to Justice: Evidence from All-Women Police Stations in India | American Political Science Review | Cambridge Core. Cambridge Core; Cambridge University Press. https://www.cambridge.org/core/journals/american-political-science-review/article/gender-law-enforcement-and-access-to-justice-evidence-from-allwomen-police-stations-in-india/A93960403DE5B1AF497740888BE2B1B2
+
+Khoury, L., Tang, Y. L., Bradley, B., Cubells, J. F., &amp; Ressler, K. J. (2010, December). Substance use, childhood traumatic experience, and posttraumatic stress disorder in an urban civilian population. Depression and anxiety. Retrieved October 20, 2022, from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3051362/
+
+Moffitt, T. E., &amp; Klaus-Grawe 2012 Think Tank. (2013, November). Childhood exposure to violence and lifelong health: Clinical intervention science and stress-biology research join forces. Development and psychopathology. Retrieved October 20, 2022, from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3869039/
+
+National Crime Records Bureau. (n.d.). Retrieved December 11, 2022, from https://ncrb.gov.in/en
+
+OHCHR. (1989, November 20). Convention on the Rights of the Child. OHCHR; General Assembly resolution 44/25. https://www.ohchr.org/en/instruments-mechanisms/instruments/convention-rights-child
+
+Reserve Bank of India. Retrieved December 11, 2022, from https://rbi.org.in/ 
+
+Seth, R. S., & Srivastava, R. N. S. (2017). Child Sexual Abuse: Management and prevention, and protection of children from Sexual Offences (POCSO) Act | SpringerLink. SpringerLink; Indian Pediatr. https://link.springer.com/article/10.1007/s13312-017-1189-9
+
+THE GARZETTE OF INDIA, T. G. O. I. (2012, June 20). THE PROTECTION OF CHILDREN FROM SEXUAL OFFENSES ACT, 2012. MINISTRY OF WOMEN & CHILD DEVELOPMENT; MINISTRY OF LAW AND JUSTICE. https://wcd.nic.in/sites/default/files/POCSO%20Act%2C%202012.pdf
+
+Thelwell, K. (2021, July 2). Female Genital Mutilation in India: A Well-Kept Secret - The Borgen Project. The Borgen Project; https://www.facebook.com/borgenproject. https://borgenproject.org/female-genital-mutilation-in-india/
+
+UNICEF. (2014, October). A Statistical Snapshot of Violence against Adolescent Girls - UNICEF DATA. UNICEF DATA; UNICEF. https://data.unicef.org/resources/statistical-snapshot-violence-adolescent-girls/
+
+UNICEF. (2022). Child marriage - UNICEF DATA. UNICEF DATA; UNICEF. https://data.unicef.org/topic/child-protection/child-marriage/
+
+United Nations. (n.d.). Youth - United Nations Sustainable Development. United Nations. Retrieved October 20, 2022, from https://www.un.org/sustainabledevelopment/youth/
+
+Violent crimes - national crime records bureau. (n.d.). Retrieved October 21, 2022, from https://ncrb.gov.in/sites/default/files/crime_in_india_table_additional_table_chapter_reports/Chapter%203_2011.pdf
+
+Wessells, M., Lilley, S., Stark, L., Lamin, D. F. M., King, D., & Kostelny, K. (2016, March 8). The limits of top-down approaches to managing diversity: Lessons from the case of child protection and child rights in Sierra Leone. Peace and Conflict: Journal of Peace Psychology. Retrieved December 8, 2022, from https://www.academia.edu/22497776/The_Limits_of_Top_Down_Approaches_to_Managing_Diversity_Lessons_From_the_Case_of_Child_Protection_and_Child_Rights_in_Sierra_Leone 
+
+WHO. (2022). Female genital mutilation. World Health Organization (WHO); WHO. https://www.who.int/news-room/fact-sheets/detail/female-genital-mutilation
+
+### R packages:
+
+Hadley Wickham and Maximilian Girlich (2022). tidyr: Tidy Messy Data.
+R package version 1.2.1. https://CRAN.R-project.org/package=tidyr
+
+Wickham H, Averick M, Bryan J, Chang W, McGowan LD, François R,
+Grolemund G, Hayes A, Henry L, Hester J, Kuhn M, Pedersen TL, Miller E,
+Bache SM, Müller K, Ooms J, Robinson D, Seidel DP, Spinu V, Takahashi
+K, Vaughan D, Wilke C, Woo K, Yutani H (2019). "Welcome to the
+tidyverse." _Journal of Open Source Software_, *4*(43), 1686. doi:
+10.21105/joss.01686 (URL: https://doi.org/10.21105/joss.01686).
+
+Hadley Wickham and Jennifer Bryan (2022). readxl: Read Excel Files. R
+package version 1.4.1. https://CRAN.R-project.org/package=readxl
+
+Hadley Wickham, Evan Miller and Danny Smith (2022). haven: Import and
+Export ’SPSS’, ’Stata’ and ’SAS’ Files. R package version 2.5.1.
+https://CRAN.R-project.org/package=haven
+
+Max Kuhn (2022). caret: Classification and Regression Training. R
+package version 6.0-93. https://CRAN.R-project.org/package=caret
+
+H. Wickham. ggplot2: Elegant Graphics for Data Analysis.
+Springer-Verlag New York, 2016.
+
+Roger Bivand and Nicholas Lewin-Koh (2022). maptools: Tools for
+Handling Spatial Objects. R package version 1.1-5.
+https://CRAN.R-project.org/package=maptools
+
+Roger Bivand and Colin Rundel (2021). rgeos: Interface to Geometry
+Engine - Open Source (’GEOS’). R package version 0.5-9.
+https://CRAN.R-project.org/package=rgeos
+
+D. Kahle and H. Wickham. ggmap: Spatial Visualization with ggplot2.
+The R Journal, 5(1), 144-161. URL
+http://journal.r-project.org/archive/2013-1/kahle-wickham.pdf
+
+Hadley Wickham and Dana Seidel (2022). scales: Scale Functions for
+Visualization. R package version 1.2.1.
+https://CRAN.R-project.org/package=scales
+
+Erich Neuwirth (2022). RColorBrewer: ColorBrewer Palettes. R package
+version 1.1-3. https://CRAN.R-project.org/package=RColorBrewer
+
+Guangchuang Yu (2022). shadowtext: Shadow Text Grob and Layer. R
+package version 0.1.2. https://CRAN.R-project.org/package=shadowtext
+
+Baptiste Auguie (2017). gridExtra: Miscellaneous Functions for "Grid"
+Graphics. R package version 2.3.
+https://CRAN.R-project.org/package=gridExtra
+
+
